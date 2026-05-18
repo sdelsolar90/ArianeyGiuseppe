@@ -1,0 +1,13 @@
+name: arianeygiuseppe
+
+services:
+  web:
+    image: arianeygiuseppe-web
+    network_mode: host
+    environment:
+      - NODE_ENV=production
+      - PORT=4200
+      - HOSTNAME=0.0.0.0
+    env_file:
+      - .env.production
+    restart: unless-stopped
