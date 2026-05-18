@@ -40,7 +40,7 @@
     "item2Location": "Residenza Antica Flaminia",
     "item3Time": "13:30",
     "item3Title": "The toast",
-    "item3Desc": "A few words from the bride and groom before the party, thanking every gesture and every gift that makes us feel at home.",
+    "item3Desc": "A few words from the bride and groom, grateful to have family and friends close, sharing in this special day.",
     "item3Tip": "Grateful to have family and friends close — a gift that makes us feel at home.",
     "item3Location": "Residenza Antica Flaminia",
     "item4Time": "Afternoon",
@@ -152,7 +152,7 @@
     "thanks": "Thank you for being there."
   },
   "playlist": {
-    "openButton": "Listen to our playlist",
+    "openButton": "Drop your two must-play songs here",
     "eyebrow": "Playlist",
     "title": "The soundtrack",
     "intro": "These are what we'll play when you dance with us. Missing one? Add it yourself to our collaborative Spotify playlist.",

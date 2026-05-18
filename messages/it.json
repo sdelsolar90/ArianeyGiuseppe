@@ -40,7 +40,7 @@
     "item2Location": "Residenza Antica Flaminia",
     "item3Time": "13:30",
     "item3Title": "Il brindisi",
-    "item3Desc": "Qualche parola degli sposi prima della festa, ringraziando ogni gesto e ogni regalo che ci fa sentire a casa.",
+    "item3Desc": "Qualche parola degli sposi, grati di avere vicino la famiglia e gli amici in questo giorno così speciale.",
     "item3Tip": "Grati di avere la famiglia e gli amici vicino, un regalo che ci fa sentire a casa.",
     "item3Location": "Residenza Antica Flaminia",
     "item4Time": "Pomeriggio",
@@ -152,7 +152,7 @@
     "thanks": "Grazie per esserci."
   },
   "playlist": {
-    "openButton": "Ascolta la nostra playlist",
+    "openButton": "Metti le tue due canzoni immancabili qui",
     "eyebrow": "Playlist",
     "title": "La colonna sonora",
     "intro": "Queste sono quelle che metteremo quando ballerete con noi. Ne manca una? Aggiungila tu direttamente alla nostra playlist condivisa su Spotify.",

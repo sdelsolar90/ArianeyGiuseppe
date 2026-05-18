@@ -40,7 +40,7 @@
     "item2Location": "Residenza Antica Flaminia",
     "item3Time": "13:30 h",
     "item3Title": "El brindis",
-    "item3Desc": "Unas palabras de los novios antes de la fiesta, agradeciendo cada gesto y cada regalo que nos hace sentir en casa.",
+    "item3Desc": "Unas palabras de los novios agradeciendo tener cerca a la familia y a los amigos compartiendo en este día tan especial.",
     "item3Tip": "Agradeciendo tener a la familia y a los amigos cerca, un regalo que nos hace sentir en casa.",
     "item3Location": "Residenza Antica Flaminia",
     "item4Time": "Tarde",
@@ -152,7 +152,7 @@
     "thanks": "Gracias por estar."
   },
   "playlist": {
-    "openButton": "Escuchar nuestra playlist",
+    "openButton": "Pon tus dos canciones infaltables aquí",
     "eyebrow": "Playlist",
     "title": "La banda sonora",
     "intro": "Las pondremos cuando bailen con nosotros. ¿Falta alguna? Añádela tú directamente en nuestra playlist colaborativa de Spotify.",
