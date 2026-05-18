@@ -2,11 +2,21 @@
 
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import FadeUp from "./FadeUp";
 import { WEDDING } from "@/lib/constants";
-import { BusIcon, RingIcon, GlassIcon, PinIcon, CalendarIcon, MusicNoteIcon } from "./icons";
+import {
+  BusIcon,
+  RingIcon,
+  GlassIcon,
+  MicIcon,
+  PinIcon,
+  CalendarIcon,
+  MusicNoteIcon,
+  GiftIcon,
+} from "./icons";
 import { openPlaylist } from "./PlaylistModal";
+import { openGifts } from "./GiftModal";
 
 type CalEvent = "embarque" | "ceremonia" | "fiesta" | "all";
 const icsUrl = (event: CalEvent) => `/api/ics?event=${event}`;
@@ -40,6 +50,15 @@ const ACCENTS: Accent[] = [
     shadow: "shadow-[0_0_30px_rgba(201,105,78,0.3)]",
   },
   {
+    // Toast — antique gold
+    text: "text-oro-deep",
+    bg: "bg-oro-deep",
+    bgSoft: "bg-oro-deep/15",
+    ring: "ring-oro-deep/30",
+    ringStrong: "ring-oro-deep/70",
+    shadow: "shadow-[0_0_30px_rgba(201,169,97,0.3)]",
+  },
+  {
     // Evening fire — terracotta
     text: "text-terracota-soft",
     bg: "bg-terracota",
@@ -50,7 +69,7 @@ const ACCENTS: Accent[] = [
   },
 ];
 
-const NUMERALS = ["I", "II", "III"];
+const NUMERALS = ["I", "II", "III", "IV"];
 
 type Item = {
   time: string;
@@ -59,15 +78,17 @@ type Item = {
   tip: string;
   locationLabel: string;
   locationUrl: string;
-  calEvent: CalEvent;
   Icon: typeof BusIcon;
   accent: Accent;
   numeral: string;
+  giftCta?: boolean;
 };
 
 export default function ElDia() {
   const t = useTranslations("elDia");
   const tPlaylist = useTranslations("playlist");
+  const tGifts = useTranslations("gifts");
+  const locale = useLocale() as keyof typeof WEDDING.weekday;
   const [openIdx, setOpenIdx] = useState<number | null>(0);
 
   const items: Item[] = [
@@ -78,7 +99,6 @@ export default function ElDia() {
       tip: t("item1Tip"),
       locationLabel: t("item1Location"),
       locationUrl: WEDDING.hotelNhow.mapsUrl,
-      calEvent: "embarque",
       Icon: BusIcon,
       accent: ACCENTS[0],
       numeral: NUMERALS[0],
@@ -90,7 +110,6 @@ export default function ElDia() {
       tip: t("item2Tip"),
       locationLabel: t("item2Location"),
       locationUrl: WEDDING.venue.mapsUrl,
-      calEvent: "ceremonia",
       Icon: RingIcon,
       accent: ACCENTS[1],
       numeral: NUMERALS[1],
@@ -102,14 +121,26 @@ export default function ElDia() {
       tip: t("item3Tip"),
       locationLabel: t("item3Location"),
       locationUrl: WEDDING.venue.mapsUrl,
-      calEvent: "fiesta",
-      Icon: GlassIcon,
+      Icon: MicIcon,
       accent: ACCENTS[2],
       numeral: NUMERALS[2],
+      giftCta: true,
+    },
+    {
+      time: t("item4Time"),
+      title: t("item4Title"),
+      desc: t("item4Desc"),
+      tip: t("item4Tip"),
+      locationLabel: t("item4Location"),
+      locationUrl: WEDDING.venue.mapsUrl,
+      Icon: GlassIcon,
+      accent: ACCENTS[3],
+      numeral: NUMERALS[3],
     },
   ];
 
   const allDayUrl = icsUrl("all");
+  const weekday = WEDDING.weekday[locale] ?? WEDDING.weekday.es;
 
   return (
     <section
@@ -163,6 +194,16 @@ export default function ElDia() {
           <h2 className="font-display italic text-4xl sm:text-6xl text-blanco mb-4">
             {t("title")}
           </h2>
+          <a
+            href="/api/ics?event=all"
+            className="group inline-flex items-center gap-2.5 rounded-full border border-oro-bright/40 hover:border-oro-bright/70 px-4 py-1.5 text-[0.7rem] sm:text-xs uppercase tracking-[0.3em] text-oro-bright transition"
+          >
+            <CalendarIcon size={14} />
+            <span>
+              {weekday} · {WEDDING.dateDisplay} · {WEDDING.time} h
+            </span>
+            <span aria-hidden className="text-oro-bright/70 group-hover:text-oro-bright transition">↗</span>
+          </a>
         </FadeUp>
 
         <FadeUp delay={0.05} className="text-center mb-3">
@@ -202,7 +243,6 @@ export default function ElDia() {
 
           {items.map((it, i) => {
             const open = openIdx === i;
-            const calUrl = icsUrl(it.calEvent);
 
             return (
               <FadeUp as="li" key={i} delay={i * 0.06} className="relative pl-14 sm:pl-16">
@@ -337,22 +377,23 @@ export default function ElDia() {
                                 <span>{it.locationLabel}</span>
                                 <span aria-hidden className="text-blanco/60">↗</span>
                               </a>
-                              <a
-                                href={calUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className={[
-                                  "inline-flex items-center gap-2 rounded-full px-3.5 py-2 text-xs font-medium tracking-wide ring-1 transition",
-                                  it.accent.bgSoft,
-                                  it.accent.text,
-                                  it.accent.ring,
-                                  "hover:" + it.accent.ringStrong,
-                                ].join(" ")}
-                              >
-                                <CalendarIcon size={14} />
-                                <span>{t("addToCalendar")}</span>
-                              </a>
-                              {i === 2 && (
+                              {it.giftCta && (
+                                <button
+                                  type="button"
+                                  onClick={openGifts}
+                                  className={[
+                                    "inline-flex items-center gap-2 rounded-full px-3.5 py-2 text-xs font-semibold tracking-wide ring-1 transition",
+                                    it.accent.bgSoft,
+                                    it.accent.text,
+                                    it.accent.ring,
+                                  ].join(" ")}
+                                >
+                                  <GiftIcon size={14} />
+                                  <span>{tGifts("openButton")}</span>
+                                  <span aria-hidden>→</span>
+                                </button>
+                              )}
+                              {i === items.length - 1 && (
                                 <button
                                   type="button"
                                   onClick={openPlaylist}

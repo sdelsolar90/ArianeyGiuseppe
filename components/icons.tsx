@@ -104,6 +104,18 @@ export function RingIcon(p: IconProps) {
   );
 }
 
+export function MicIcon(p: IconProps) {
+  return (
+    <svg {...base(p)}>
+      <rect x="9" y="2" width="6" height="11" rx="3" {...STROKE} />
+      <path
+        d="M5 11a7 7 0 0 0 14 0M12 18v3M8 21h8"
+        {...STROKE}
+      />
+    </svg>
+  );
+}
+
 export function GlassIcon(p: IconProps) {
   return (
     <svg {...base(p)}>
