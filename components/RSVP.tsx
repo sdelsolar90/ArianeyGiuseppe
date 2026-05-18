@@ -5,9 +5,9 @@ import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import FadeUp from "./FadeUp";
-import { GiftIcon, MusicNoteIcon } from "./icons";
-import { openPlaylist } from "./PlaylistModal";
-import { openGifts } from "./GiftModal";
+import GiftAccountsList from "./GiftAccountsList";
+import { DiscIcon, GiftIcon, MusicNoteIcon } from "./icons";
+import { PLAYLIST } from "@/lib/constants";
 
 type Status = "idle" | "submitting" | "success" | "error";
 type Diet = "vegan" | "vegetarian" | "none" | "other" | "";
@@ -33,6 +33,7 @@ export default function RSVP() {
 
   const [status, setStatus] = useState<Status>("idle");
   const [step, setStep] = useState<1 | 2>(1);
+  const [successStep, setSuccessStep] = useState<0 | 1 | 2 | 3>(0);
 
   // Main person
   const [name, setName] = useState("");
@@ -195,29 +196,149 @@ export default function RSVP() {
           <FadeUp delay={0.1} className="lg:col-span-7 order-1 lg:order-2">
             <div className="rounded-3xl bg-blanco text-marron p-6 sm:p-10 shadow-2xl">
               {status === "success" ? (
-                <div className="py-10 text-center">
-                  <p className="font-display italic text-4xl text-terracota mb-3">
-                    {t("successTitle")}
-                  </p>
-                  <p className="text-marron/80 mb-7">{t("successDesc")}</p>
-                  <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                    <button
-                      type="button"
-                      onClick={openPlaylist}
-                      className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full bg-terracota text-blanco px-5 py-3 text-sm font-semibold tracking-wide ring-1 ring-oro/50 hover:bg-terracota-soft transition shadow-md"
-                    >
-                      <MusicNoteIcon size={16} />
-                      <span>{tPlaylist("suggestCta")}</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={openGifts}
-                      className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full border border-terracota/40 text-terracota px-5 py-3 text-sm font-semibold tracking-wide hover:bg-terracota/5 transition"
-                    >
-                      <GiftIcon size={16} />
-                      <span>{tGifts("openButton")}</span>
-                    </button>
-                  </div>
+                <div className="min-h-[460px] flex flex-col">
+                  <AnimatePresence mode="wait" initial={false}>
+                    {successStep === 0 && (
+                      <motion.div
+                        key="ok"
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={{ duration: 0.3, ease: "easeOut" }}
+                        className="flex-1 flex flex-col items-center justify-center text-center py-10"
+                      >
+                        <p className="font-display italic text-5xl text-terracota mb-3">
+                          {t("successTitle")}
+                        </p>
+                        <p className="text-marron/80 mb-2">{t("successDesc")}</p>
+                        <p className="font-display italic text-marron/55 text-base mb-8">
+                          {t("successHint")}
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => setSuccessStep(1)}
+                          className="inline-flex items-center gap-2 rounded-full bg-terracota text-blanco px-6 py-3 text-sm font-semibold tracking-wide ring-1 ring-oro/60 hover:bg-terracota-soft transition shadow-md"
+                        >
+                          <span>{t("successContinue")}</span>
+                          <span aria-hidden>→</span>
+                        </button>
+                      </motion.div>
+                    )}
+
+                    {successStep === 1 && (
+                      <motion.div
+                        key="gifts"
+                        initial={{ opacity: 0, x: 16 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -16 }}
+                        transition={{ duration: 0.3, ease: "easeOut" }}
+                        className="flex-1 flex flex-col"
+                      >
+                        <div className="text-center mb-6">
+                          <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-terracota/10 text-terracota mb-3">
+                            <GiftIcon size={22} />
+                          </div>
+                          <p className="font-body text-[0.65rem] uppercase tracking-[0.4em] text-terracota mb-2">
+                            — {tGifts("eyebrow")}
+                          </p>
+                          <h3 className="font-display italic text-3xl sm:text-4xl text-marron mb-3">
+                            {tGifts("title")}
+                          </h3>
+                          <p className="font-display text-base text-marron/75 max-w-md mx-auto leading-relaxed">
+                            {tGifts("intro")}
+                          </p>
+                        </div>
+
+                        <GiftAccountsList />
+
+                        <p className="text-center pt-5 font-display italic text-terracota text-base">
+                          {tGifts("thanks")}
+                        </p>
+
+                        <div className="mt-6 flex justify-center">
+                          <button
+                            type="button"
+                            onClick={() => setSuccessStep(2)}
+                            className="inline-flex items-center gap-2 rounded-full bg-terracota text-blanco px-6 py-3 text-sm font-semibold tracking-wide ring-1 ring-oro/60 hover:bg-terracota-soft transition shadow-md"
+                          >
+                            <span>{t("successContinue")}</span>
+                            <span aria-hidden>→</span>
+                          </button>
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {successStep === 2 && (
+                      <motion.div
+                        key="song"
+                        initial={{ opacity: 0, x: 16 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -16 }}
+                        transition={{ duration: 0.3, ease: "easeOut" }}
+                        className="flex-1 flex flex-col items-center justify-center text-center py-10"
+                      >
+                        <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-terracota/10 text-terracota mb-3">
+                          <MusicNoteIcon size={22} />
+                        </div>
+                        <p className="font-body text-[0.65rem] uppercase tracking-[0.4em] text-terracota mb-2">
+                          — {tPlaylist("eyebrow")}
+                        </p>
+                        <h3 className="font-display italic text-3xl sm:text-4xl text-marron mb-3">
+                          {t("songStepTitle")}
+                        </h3>
+                        <p className="font-display text-base sm:text-lg text-marron/75 max-w-md mx-auto leading-relaxed mb-7">
+                          {tPlaylist("intro")}
+                        </p>
+                        <a
+                          href={PLAYLIST.spotifyUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 rounded-full bg-marron text-blanco px-5 py-3 text-sm font-semibold tracking-wide hover:bg-marron-deep transition shadow-md mb-3"
+                        >
+                          <DiscIcon size={16} />
+                          <span>{tPlaylist("spotifyCta")}</span>
+                          <span aria-hidden>↗</span>
+                        </a>
+                        <button
+                          type="button"
+                          onClick={() => setSuccessStep(3)}
+                          className="text-xs font-semibold tracking-wide text-marron/55 hover:text-terracota transition"
+                        >
+                          {t("successFinish")} →
+                        </button>
+                      </motion.div>
+                    )}
+
+                    {successStep === 3 && (
+                      <motion.div
+                        key="final"
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        transition={{ duration: 0.4, ease: "easeOut" }}
+                        className="flex-1 flex flex-col items-center justify-center text-center py-10"
+                      >
+                        <div className="flex items-center justify-center gap-3 text-terracota/50 mb-6">
+                          <span className="h-px w-12 bg-terracota/30" aria-hidden />
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
+                            <path
+                              d="M12 4l1.6 5.2L19 11l-5.4 1.8L12 18l-1.6-5.2L5 11l5.4-1.8L12 4z"
+                              stroke="currentColor"
+                              strokeWidth="1.3"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                          <span className="h-px w-12 bg-terracota/30" aria-hidden />
+                        </div>
+                        <p className="font-display italic text-5xl sm:text-6xl text-terracota mb-3">
+                          {t("successFinalTitle")}
+                        </p>
+                        <p className="font-body text-xs uppercase tracking-[0.4em] text-marron/55">
+                          {t("successFinalDesc")}
+                        </p>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               ) : (
                 <form onSubmit={onFormSubmit} className="space-y-5">

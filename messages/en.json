@@ -113,6 +113,12 @@
     "submitting": "Sending…",
     "successTitle": "Done!",
     "successDesc": "Thanks for confirming. See you in Rome.",
+    "successHint": "Before you go, two more things.",
+    "successContinue": "Continue",
+    "successFinish": "All set!",
+    "successFinalTitle": "Cheers in Rome.",
+    "successFinalDesc": "See you on 10 · 10 · 26.",
+    "songStepTitle": "And one song",
     "errorTitle": "Something went wrong",
     "errorDesc": "Please try again in a moment."
   },

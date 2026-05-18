@@ -113,6 +113,12 @@
     "submitting": "Invio…",
     "successTitle": "Fatto!",
     "successDesc": "Grazie per aver confermato. Ci vediamo a Roma.",
+    "successHint": "Prima di andare, ancora due cose.",
+    "successContinue": "Continua",
+    "successFinish": "Pronto!",
+    "successFinalTitle": "Brindiamo a Roma.",
+    "successFinalDesc": "Al 10 · 10 · 26.",
+    "songStepTitle": "E una canzone",
     "errorTitle": "Qualcosa è andato storto",
     "errorDesc": "Riprova tra un momento."
   },
