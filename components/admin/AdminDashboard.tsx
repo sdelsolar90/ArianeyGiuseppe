@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import EditRsvpModal, { type EditableRsvp } from "./EditRsvpModal";
 
 type Row = {
   id: string;
@@ -42,13 +43,30 @@ const ALLERGY_LABEL: Record<string, string> = {
   other: "Otra",
 };
 
-type Filter = "all" | "yes" | "no";
-
 const DIET_LABEL: Record<string, string> = {
   vegan: "Vegana",
   vegetarian: "Vegetariana",
   none: "Ninguna",
   other: "Otra",
+};
+
+type Filter = "all" | "yes" | "no";
+
+type FlatRow = {
+  key: string;
+  rsvpId: string;
+  isPlusOne: boolean;
+  parentName: string;
+  name: string;
+  email: string;
+  attending: "yes" | "no";
+  bus: string;
+  diet_pref: string;
+  diet_other: string;
+  allergies: string[];
+  allergy_other: string;
+  locale: string;
+  created_at: string;
 };
 
 function formatDate(iso: string) {
@@ -62,6 +80,68 @@ function formatDate(iso: string) {
   });
 }
 
+function flatten(rows: Row[]): FlatRow[] {
+  const out: FlatRow[] = [];
+  for (const r of rows) {
+    out.push({
+      key: `${r.id}-main`,
+      rsvpId: r.id,
+      isPlusOne: false,
+      parentName: "",
+      name: r.name,
+      email: r.email,
+      attending: r.attending,
+      bus: r.bus,
+      diet_pref: r.diet_pref,
+      diet_other: r.diet_other,
+      allergies: r.allergies ?? [],
+      allergy_other: r.allergy_other,
+      locale: r.locale,
+      created_at: r.created_at,
+    });
+    if (r.plus_one && r.attending === "yes") {
+      out.push({
+        key: `${r.id}-plus`,
+        rsvpId: r.id,
+        isPlusOne: true,
+        parentName: r.name,
+        name: r.plus_one_name || "—",
+        email: r.email,
+        attending: "yes",
+        bus: r.plus_one_bus,
+        diet_pref: r.plus_one_diet_pref,
+        diet_other: r.plus_one_diet_other,
+        allergies: r.plus_one_allergies ?? [],
+        allergy_other: r.plus_one_allergy_other,
+        locale: r.locale,
+        created_at: r.created_at,
+      });
+    }
+  }
+  return out;
+}
+
+function rowToEditable(r: Row): EditableRsvp {
+  return {
+    id: r.id,
+    name: r.name,
+    email: r.email,
+    attending: r.attending,
+    bus: r.bus,
+    diet_pref: r.diet_pref,
+    diet_other: r.diet_other,
+    allergies: r.allergies ?? [],
+    allergy_other: r.allergy_other,
+    plus_one: r.plus_one,
+    plus_one_name: r.plus_one_name,
+    plus_one_bus: r.plus_one_bus,
+    plus_one_diet_pref: r.plus_one_diet_pref,
+    plus_one_diet_other: r.plus_one_diet_other,
+    plus_one_allergies: r.plus_one_allergies ?? [],
+    plus_one_allergy_other: r.plus_one_allergy_other,
+  };
+}
+
 export default function AdminDashboard() {
   const [rows, setRows] = useState<Row[]>([]);
   const [totals, setTotals] = useState<Totals | null>(null);
@@ -69,6 +149,7 @@ export default function AdminDashboard() {
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<Filter>("all");
   const [search, setSearch] = useState("");
+  const [editing, setEditing] = useState<EditableRsvp | null>(null);
 
   const load = async () => {
     setLoading(true);
@@ -90,19 +171,26 @@ export default function AdminDashboard() {
     load();
   }, []);
 
+  const flat = useMemo(() => flatten(rows), [rows]);
+
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    return rows.filter((r) => {
+    return flat.filter((r) => {
       if (filter === "yes" && r.attending !== "yes") return false;
       if (filter === "no" && r.attending !== "no") return false;
       if (!q) return true;
       return (
         r.name.toLowerCase().includes(q) ||
         r.email.toLowerCase().includes(q) ||
-        r.plus_one_name.toLowerCase().includes(q)
+        r.parentName.toLowerCase().includes(q)
       );
     });
-  }, [rows, filter, search]);
+  }, [flat, filter, search]);
+
+  const openEdit = (rsvpId: string) => {
+    const r = rows.find((x) => x.id === rsvpId);
+    if (r) setEditing(rowToEditable(r));
+  };
 
   const logout = async () => {
     await fetch("/api/admin/logout", { method: "POST" });
@@ -111,7 +199,6 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen">
-      {/* Top bar */}
       <header className="border-b border-marron/10 bg-blanco">
         <div className="mx-auto max-w-7xl px-6 py-4 flex items-center justify-between">
           <div>
@@ -133,44 +220,22 @@ export default function AdminDashboard() {
       </header>
 
       <main className="mx-auto max-w-7xl px-6 py-10 space-y-8">
-        {/* Stats */}
         <section className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
           <StatCard label="Confirmados" value={totals?.attending ?? 0} accent="terracota" />
-          <StatCard label="Personas" value={totals?.headcount ?? 0} accent="oro" hint="Incluye acompañantes" />
+          <StatCard label="Personas" value={totals?.headcount ?? 0} accent="oro" />
           <StatCard label="Bus" value={totals?.busSeats ?? 0} accent="marron" hint="Asientos solicitados" />
           <StatCard label="No vienen" value={totals?.declined ?? 0} accent="muted" />
         </section>
 
-        {/* Catering */}
         <section>
           <h2 className="font-body text-[0.65rem] uppercase tracking-[0.4em] text-terracota mb-3">
             — Catering
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-4">
-            <StatCard
-              label="Veganos"
-              value={totals?.diet.vegan ?? 0}
-              accent="oro"
-              hint="Platos veganos"
-            />
-            <StatCard
-              label="Vegetarianos"
-              value={totals?.diet.vegetarian ?? 0}
-              accent="oro"
-              hint="Platos vegetarianos"
-            />
-            <StatCard
-              label="Sin restricciones"
-              value={totals?.diet.none ?? 0}
-              accent="terracota"
-              hint="Menú estándar"
-            />
-            <StatCard
-              label="Otras dietas"
-              value={totals?.diet.other ?? 0}
-              accent="muted"
-              hint="Pedir detalles"
-            />
+            <StatCard label="Veganos" value={totals?.diet.vegan ?? 0} accent="oro" hint="Platos veganos" />
+            <StatCard label="Vegetarianos" value={totals?.diet.vegetarian ?? 0} accent="oro" hint="Platos vegetarianos" />
+            <StatCard label="Sin restricciones" value={totals?.diet.none ?? 0} accent="terracota" hint="Menú estándar" />
+            <StatCard label="Otras dietas" value={totals?.diet.other ?? 0} accent="muted" hint="Pedir detalles" />
           </div>
           <div className="rounded-2xl bg-blanco ring-1 ring-marron/10 p-5">
             <p className="text-[0.65rem] uppercase tracking-[0.3em] text-marron/55 mb-3">
@@ -200,7 +265,6 @@ export default function AdminDashboard() {
           </div>
         </section>
 
-        {/* Toolbar */}
         <section className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
           <input
             type="search"
@@ -236,7 +300,6 @@ export default function AdminDashboard() {
           </button>
         </section>
 
-        {/* Table */}
         <section className="rounded-2xl bg-blanco ring-1 ring-marron/10 overflow-hidden">
           {loading ? (
             <p className="px-6 py-12 text-center text-marron/60">Cargando…</p>
@@ -260,34 +323,39 @@ export default function AdminDashboard() {
                     <Th>Bus</Th>
                     <Th>Dieta</Th>
                     <Th>Alergias</Th>
-                    <Th>Acompañante</Th>
                     <Th>Idioma</Th>
+                    <Th> </Th>
                   </tr>
                 </thead>
                 <tbody>
                   {filtered.map((r, i) => (
                     <tr
-                      key={r.id}
+                      key={r.key}
                       className={[
                         "border-t border-marron/5 hover:bg-crema/40 transition",
                         i % 2 === 0 ? "bg-transparent" : "bg-crema/20",
                       ].join(" ")}
                     >
                       <Td className="whitespace-nowrap text-marron/70">
-                        {formatDate(r.created_at)}
+                        {r.isPlusOne ? "" : formatDate(r.created_at)}
                       </Td>
-                      <Td className="font-semibold text-marron">{r.name}</Td>
-                      <Td className="text-marron/80">{r.email}</Td>
                       <Td>
-                        <Badge
-                          variant={r.attending === "yes" ? "terracota" : "muted"}
-                        >
+                        <div className="font-semibold text-marron">{r.name}</div>
+                        {r.isPlusOne && (
+                          <span className="inline-block mt-1 rounded-full bg-oro/15 text-oro-deep px-2 py-0.5 text-[0.65rem] font-semibold tracking-wide">
+                            +1 de {r.parentName}
+                          </span>
+                        )}
+                      </Td>
+                      <Td className={r.isPlusOne ? "text-marron/50 italic" : "text-marron/80"}>
+                        {r.email}
+                      </Td>
+                      <Td>
+                        <Badge variant={r.attending === "yes" ? "terracota" : "muted"}>
                           {r.attending === "yes" ? "Sí" : "No"}
                         </Badge>
                       </Td>
-                      <Td>
-                        {r.bus ? (r.bus === "yes" ? "Sí" : "No") : "—"}
-                      </Td>
+                      <Td>{r.bus === "yes" ? "Sí" : r.bus === "no" ? "No" : "—"}</Td>
                       <Td>
                         {r.diet_pref ? (
                           <>
@@ -305,7 +373,11 @@ export default function AdminDashboard() {
                       <Td>
                         {r.allergies?.length ? (
                           <>
-                            <span>{r.allergies.join(", ")}</span>
+                            <span>
+                              {r.allergies
+                                .map((a) => ALLERGY_LABEL[a] ?? a)
+                                .join(", ")}
+                            </span>
                             {r.allergy_other && (
                               <span className="block text-xs text-marron/55">
                                 {r.allergy_other}
@@ -317,24 +389,19 @@ export default function AdminDashboard() {
                         )}
                       </Td>
                       <Td>
-                        {r.plus_one ? (
-                          <div>
-                            <span className="font-semibold">{r.plus_one_name || "—"}</span>
-                            <span className="block text-xs text-marron/55">
-                              {DIET_LABEL[r.plus_one_diet_pref] ?? r.plus_one_diet_pref}
-                              {r.plus_one_allergies?.length
-                                ? ` · ${r.plus_one_allergies.join(", ")}`
-                                : ""}
-                            </span>
-                          </div>
-                        ) : (
-                          "—"
-                        )}
-                      </Td>
-                      <Td>
                         <span className="font-mono text-[0.7rem] uppercase tracking-wider text-marron/60">
                           {r.locale}
                         </span>
+                      </Td>
+                      <Td className="text-right">
+                        <button
+                          type="button"
+                          onClick={() => openEdit(r.rsvpId)}
+                          className="text-xs font-semibold tracking-wide text-terracota hover:text-terracota-soft transition"
+                          aria-label={`Editar ${r.name}`}
+                        >
+                          Editar
+                        </button>
                       </Td>
                     </tr>
                   ))}
@@ -345,10 +412,18 @@ export default function AdminDashboard() {
         </section>
 
         <p className="text-center text-xs text-marron/50">
-          {filtered.length} {filtered.length === 1 ? "fila visible" : "filas visibles"} ·{" "}
-          {totals?.submissions ?? 0} totales
+          {filtered.length} {filtered.length === 1 ? "persona visible" : "personas visibles"} ·{" "}
+          {totals?.submissions ?? 0} confirmaciones totales
         </p>
       </main>
+
+      {editing && (
+        <EditRsvpModal
+          row={editing}
+          onClose={() => setEditing(null)}
+          onSaved={load}
+        />
+      )}
     </div>
   );
 }
