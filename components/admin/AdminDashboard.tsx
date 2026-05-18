@@ -29,6 +29,17 @@ type Totals = {
   declined: number;
   headcount: number;
   busSeats: number;
+  diet: { vegan: number; vegetarian: number; none: number; other: number };
+  allergies: Record<string, number>;
+};
+
+const ALLERGY_LABEL: Record<string, string> = {
+  gluten: "Gluten",
+  lactose: "Lactosa",
+  nuts: "Frutos secos",
+  seafood: "Mariscos",
+  egg: "Huevo",
+  other: "Otra",
 };
 
 type Filter = "all" | "yes" | "no";
@@ -128,6 +139,65 @@ export default function AdminDashboard() {
           <StatCard label="Personas" value={totals?.headcount ?? 0} accent="oro" hint="Incluye acompañantes" />
           <StatCard label="Bus" value={totals?.busSeats ?? 0} accent="marron" hint="Asientos solicitados" />
           <StatCard label="No vienen" value={totals?.declined ?? 0} accent="muted" />
+        </section>
+
+        {/* Catering */}
+        <section>
+          <h2 className="font-body text-[0.65rem] uppercase tracking-[0.4em] text-terracota mb-3">
+            — Catering
+          </h2>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-4">
+            <StatCard
+              label="Veganos"
+              value={totals?.diet.vegan ?? 0}
+              accent="oro"
+              hint="Platos veganos"
+            />
+            <StatCard
+              label="Vegetarianos"
+              value={totals?.diet.vegetarian ?? 0}
+              accent="oro"
+              hint="Platos vegetarianos"
+            />
+            <StatCard
+              label="Sin restricciones"
+              value={totals?.diet.none ?? 0}
+              accent="terracota"
+              hint="Menú estándar"
+            />
+            <StatCard
+              label="Otras dietas"
+              value={totals?.diet.other ?? 0}
+              accent="muted"
+              hint="Pedir detalles"
+            />
+          </div>
+          <div className="rounded-2xl bg-blanco ring-1 ring-marron/10 p-5">
+            <p className="text-[0.65rem] uppercase tracking-[0.3em] text-marron/55 mb-3">
+              Alergias e intolerancias
+            </p>
+            {totals && Object.keys(totals.allergies).length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {Object.entries(totals.allergies)
+                  .sort((a, b) => b[1] - a[1])
+                  .map(([key, count]) => (
+                    <span
+                      key={key}
+                      className="inline-flex items-center gap-2 rounded-full bg-terracota/10 px-3 py-1.5 text-xs"
+                    >
+                      <span className="text-marron font-medium">
+                        {ALLERGY_LABEL[key] ?? key}
+                      </span>
+                      <span className="text-terracota font-mono font-bold">
+                        {count}
+                      </span>
+                    </span>
+                  ))}
+              </div>
+            ) : (
+              <p className="text-sm text-marron/55">Sin alergias registradas todavía.</p>
+            )}
+          </div>
         </section>
 
         {/* Toolbar */}

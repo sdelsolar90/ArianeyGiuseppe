@@ -1,7 +1,3 @@
-"use client";
-
-import { useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
 import { useLocale, useTranslations } from "next-intl";
 import FadeUp from "./FadeUp";
 import { WEDDING } from "@/lib/constants";
@@ -12,11 +8,8 @@ import {
   MicIcon,
   PinIcon,
   CalendarIcon,
-  MusicNoteIcon,
-  GiftIcon,
 } from "./icons";
-import { openPlaylist } from "./PlaylistModal";
-import { openGifts } from "./GiftModal";
+import ElDiaActions from "./ElDiaActions";
 
 type CalEvent = "embarque" | "ceremonia" | "fiesta" | "all";
 const icsUrl = (event: CalEvent) => `/api/ics?event=${event}`;
@@ -27,44 +20,45 @@ type Accent = {
   bgSoft: string;
   ring: string;
   ringStrong: string;
+  border: string;
   shadow: string;
 };
 
 const ACCENTS: Accent[] = [
   {
-    // Morning warmth — bright gold
     text: "text-oro-bright",
     bg: "bg-oro-bright",
     bgSoft: "bg-oro-bright/15",
     ring: "ring-oro-bright/30",
     ringStrong: "ring-oro-bright/70",
+    border: "border-oro-bright/40",
     shadow: "shadow-[0_0_30px_rgba(232,200,117,0.25)]",
   },
   {
-    // Emotional heart — coral
     text: "text-coral",
     bg: "bg-coral",
     bgSoft: "bg-coral/15",
     ring: "ring-coral/30",
     ringStrong: "ring-coral/70",
+    border: "border-coral/40",
     shadow: "shadow-[0_0_30px_rgba(201,105,78,0.3)]",
   },
   {
-    // Toast — antique gold
     text: "text-oro-deep",
     bg: "bg-oro-deep",
     bgSoft: "bg-oro-deep/15",
     ring: "ring-oro-deep/30",
     ringStrong: "ring-oro-deep/70",
+    border: "border-oro-deep/40",
     shadow: "shadow-[0_0_30px_rgba(201,169,97,0.3)]",
   },
   {
-    // Evening fire — terracotta
     text: "text-terracota-soft",
     bg: "bg-terracota",
     bgSoft: "bg-terracota/15",
     ring: "ring-terracota/30",
     ringStrong: "ring-terracota/70",
+    border: "border-terracota/40",
     shadow: "shadow-[0_0_30px_rgba(184,106,69,0.3)]",
   },
 ];
@@ -86,10 +80,7 @@ type Item = {
 
 export default function ElDia() {
   const t = useTranslations("elDia");
-  const tPlaylist = useTranslations("playlist");
-  const tGifts = useTranslations("gifts");
   const locale = useLocale() as keyof typeof WEDDING.weekday;
-  const [openIdx, setOpenIdx] = useState<number | null>(0);
 
   const items: Item[] = [
     {
@@ -151,7 +142,7 @@ export default function ElDia() {
           "linear-gradient(180deg, #4a2818 0%, #3d1f0d 35%, #3a1f12 65%, #4a2818 100%)",
       }}
     >
-      {/* Warm color blobs — stronger so the section pulses with warmth */}
+      {/* Warm color blobs */}
       <div
         aria-hidden
         className="absolute -top-32 -left-32 w-[36rem] h-[36rem] rounded-full opacity-55 blur-3xl pointer-events-none"
@@ -186,7 +177,7 @@ export default function ElDia() {
         }}
       />
 
-      <div className="relative mx-auto max-w-3xl px-6">
+      <div className="relative mx-auto max-w-4xl px-6">
         <FadeUp className="text-center mb-3">
           <p className="font-body text-xs uppercase tracking-[0.4em] text-oro-bright mb-4">
             — {t("eyebrow")}
@@ -202,214 +193,160 @@ export default function ElDia() {
             <span>
               {weekday} · {WEDDING.dateDisplay} · {WEDDING.time} h
             </span>
-            <span aria-hidden className="text-oro-bright/70 group-hover:text-oro-bright transition">↗</span>
+            <span
+              aria-hidden
+              className="text-oro-bright/70 group-hover:text-oro-bright transition"
+            >
+              ↗
+            </span>
           </a>
         </FadeUp>
 
-        <FadeUp delay={0.05} className="text-center mb-3">
-          <div className="flex items-center justify-center gap-3 text-oro-bright/60">
-            <span aria-hidden className="h-px w-10 bg-oro-bright/40" />
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
-              <path
-                d="M12 4l1.6 5.2L19 11l-5.4 1.8L12 18l-1.6-5.2L5 11l5.4-1.8L12 4z"
-                stroke="currentColor"
-                strokeWidth="1.3"
-                strokeLinejoin="round"
-              />
-            </svg>
-            <span aria-hidden className="h-px w-10 bg-oro-bright/40" />
-          </div>
+        <FadeUp delay={0.05} className="flex items-center justify-center gap-3 text-oro-bright/60 mt-6 mb-14">
+          <span aria-hidden className="h-px w-10 bg-oro-bright/40" />
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
+            <path
+              d="M12 4l1.6 5.2L19 11l-5.4 1.8L12 18l-1.6-5.2L5 11l5.4-1.8L12 4z"
+              stroke="currentColor"
+              strokeWidth="1.3"
+              strokeLinejoin="round"
+            />
+          </svg>
+          <span aria-hidden className="h-px w-10 bg-oro-bright/40" />
         </FadeUp>
 
-        <FadeUp delay={0.1} className="text-center mb-14">
-          <p className="font-display italic text-lg sm:text-xl text-blanco/70">
-            {t("subtitle")}
-          </p>
-          <p className="font-body text-[0.65rem] uppercase tracking-[0.4em] text-oro-bright/50 mt-6">
-            ↓ {t("expandHint")}
-          </p>
-        </FadeUp>
-
-        <ol className="relative space-y-5">
-          {/* vertical timeline line — fades through the accents */}
-          <div
+        <ol className="relative">
+          {/* vertical line — mobile left, desktop center */}
+          <span
             aria-hidden
-            className="absolute left-[22px] top-4 bottom-4 w-px"
+            className="absolute top-2 bottom-2 left-[22px] lg:left-1/2 w-px lg:-translate-x-1/2"
             style={{
               background:
-                "linear-gradient(to bottom, rgba(232,200,117,0.5), rgba(201,105,78,0.5) 50%, rgba(160,82,45,0.5))",
+                "linear-gradient(to bottom, rgba(232,200,117,0.5), rgba(201,105,78,0.5) 35%, rgba(201,169,97,0.5) 65%, rgba(160,82,45,0.5))",
             }}
           />
 
-          {items.map((it, i) => {
-            const open = openIdx === i;
+          {/* moving bus on the center line — desktop only */}
+          <span
+            aria-hidden
+            className="hidden lg:block absolute top-2 bottom-2 left-1/2 -translate-x-1/2 pointer-events-none w-0"
+          >
+            <span className="animate-bus absolute left-1/2 -translate-x-1/2 -translate-y-1/2 inline-flex h-10 w-10 items-center justify-center rounded-full bg-marron-deep text-oro-bright ring-2 ring-oro-bright/40 shadow-lg shadow-marron-deep/60">
+              <BusIcon size={18} />
+            </span>
+          </span>
 
+          {items.map((it, i) => {
+            const isLeft = i % 2 === 0;
             return (
-              <FadeUp as="li" key={i} delay={i * 0.06} className="relative pl-14 sm:pl-16">
-                {/* timeline dot — accent colored, glows when open */}
+              <FadeUp
+                as="li"
+                key={i}
+                delay={i * 0.08}
+                className="relative pb-12 lg:pb-20 last:pb-0"
+              >
+                {/* dot */}
                 <span
                   aria-hidden
                   className={[
-                    "absolute left-[14px] top-7 w-4 h-4 rounded-full ring-4 ring-marron transition-all duration-300",
+                    "absolute top-7 w-4 h-4 rounded-full ring-4 ring-marron",
+                    "left-[14px] lg:left-1/2 lg:-translate-x-1/2",
                     it.accent.bg,
-                    open ? `scale-125 ${it.accent.shadow}` : "",
+                    it.accent.shadow,
                   ].join(" ")}
                 />
 
-                <article
-                  className={[
-                    "relative rounded-2xl ring-1 transition-all duration-300 overflow-hidden",
-                    open
-                      ? `bg-marron-deep/65 ${it.accent.ringStrong} ${it.accent.shadow}`
-                      : "bg-marron-deep/35 ring-blanco/5 hover:ring-blanco/15 hover:bg-marron-deep/50",
-                  ].join(" ")}
-                >
-                  {/* big editorial numeral */}
-                  <span
-                    aria-hidden
-                    className={[
-                      "absolute -right-2 -top-4 font-display italic font-light leading-none select-none pointer-events-none transition-opacity duration-500",
-                      it.accent.text,
-                      open ? "opacity-25 text-[10rem] sm:text-[14rem]" : "opacity-10 text-[8rem] sm:text-[11rem]",
-                    ].join(" ")}
-                  >
-                    {it.numeral}
-                  </span>
-
-                  <button
-                    type="button"
-                    onClick={() => setOpenIdx(open ? null : i)}
-                    aria-expanded={open}
-                    className="relative w-full p-5 sm:p-6 text-left flex items-center gap-4 sm:gap-5"
-                  >
-                    {/* icon badge */}
-                    <span
+                <div className="pl-14 lg:pl-0">
+                  <div className="lg:grid lg:grid-cols-2 lg:gap-16">
+                    <div
                       className={[
-                        "flex h-12 w-12 sm:h-14 sm:w-14 shrink-0 items-center justify-center rounded-full ring-1 transition-all",
-                        it.accent.bgSoft,
-                        it.accent.ring,
-                        it.accent.text,
-                        open ? `${it.accent.ringStrong} ${it.accent.shadow}` : "",
+                        "relative",
+                        isLeft
+                          ? "lg:col-start-1 lg:pr-10 lg:text-right"
+                          : "lg:col-start-2 lg:pl-10",
                       ].join(" ")}
                     >
-                      <it.Icon size={26} />
-                    </span>
-
-                    <div className="flex-1 min-w-0">
-                      <div
+                      {/* big editorial numeral */}
+                      <span
+                        aria-hidden
                         className={[
-                          "font-mono text-[0.7rem] sm:text-xs tracking-[0.25em] uppercase mb-1 transition-colors",
+                          "absolute font-display italic font-light leading-none select-none pointer-events-none opacity-15",
+                          "text-[7rem] sm:text-[9rem] -top-8",
                           it.accent.text,
+                          isLeft ? "right-0 lg:-right-2" : "left-0 lg:-left-2",
                         ].join(" ")}
                       >
-                        {it.time}
-                      </div>
-                      <h3 className="font-display italic text-2xl sm:text-3xl text-blanco leading-tight">
-                        {it.title}
-                      </h3>
-                      <AnimatePresence initial={false}>
-                        {!open && (
-                          <motion.p
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            className="text-blanco/55 text-xs sm:text-sm truncate mt-1"
-                          >
-                            {it.locationLabel}
-                          </motion.p>
-                        )}
-                      </AnimatePresence>
-                    </div>
+                        {it.numeral}
+                      </span>
 
-                    <motion.div
-                      animate={{ rotate: open ? 45 : 0 }}
-                      transition={{ duration: 0.25 }}
-                      className={[
-                        "shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-2xl leading-none ring-1 transition-colors",
-                        open
-                          ? `${it.accent.bgSoft} ${it.accent.text} ${it.accent.ringStrong}`
-                          : "bg-blanco/5 text-blanco/60 ring-blanco/10",
-                      ].join(" ")}
-                      aria-hidden
-                    >
-                      +
-                    </motion.div>
-                  </button>
+                      <div className="relative">
+                        {/* icon badge */}
+                        <span
+                          className={[
+                            "inline-flex h-14 w-14 items-center justify-center rounded-full ring-1 mb-4",
+                            it.accent.bgSoft,
+                            it.accent.ring,
+                            it.accent.text,
+                          ].join(" ")}
+                        >
+                          <it.Icon size={26} />
+                        </span>
 
-                  <AnimatePresence initial={false}>
-                    {open && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.35, ease: "easeOut" }}
-                        className="relative overflow-hidden"
-                      >
-                        <div className="px-5 sm:px-6 pb-5 sm:pb-6">
-                          <div
-                            className={[
-                              "border-t pt-5",
-                              "border-blanco/10",
-                            ].join(" ")}
-                          >
-                            <p className="text-blanco/85 text-sm sm:text-base leading-relaxed mb-4">
-                              {it.desc}
-                            </p>
-                            <p
-                              className={[
-                                "font-display italic text-sm sm:text-base mb-5 border-l-2 pl-3",
-                                it.accent.text,
-                                it.accent.ring.replace("ring-", "border-"),
-                              ].join(" ")}
-                            >
-                              {it.tip}
-                            </p>
-                            <div className="flex flex-wrap gap-2.5">
-                              <a
-                                href={it.locationUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-2 rounded-full bg-blanco/10 hover:bg-blanco/15 text-blanco px-3.5 py-2 text-xs font-medium tracking-wide ring-1 ring-blanco/15 hover:ring-blanco/30 transition"
-                              >
-                                <span className={it.accent.text}>
-                                  <PinIcon size={14} />
-                                </span>
-                                <span>{it.locationLabel}</span>
-                                <span aria-hidden className="text-blanco/60">↗</span>
-                              </a>
-                              {it.giftCta && (
-                                <button
-                                  type="button"
-                                  onClick={openGifts}
-                                  className={[
-                                    "inline-flex items-center gap-2 rounded-full px-3.5 py-2 text-xs font-semibold tracking-wide ring-1 transition",
-                                    it.accent.bgSoft,
-                                    it.accent.text,
-                                    it.accent.ring,
-                                  ].join(" ")}
-                                >
-                                  <GiftIcon size={14} />
-                                  <span>{tGifts("openButton")}</span>
-                                  <span aria-hidden>→</span>
-                                </button>
-                              )}
-                              {i === items.length - 1 && (
-                                <button
-                                  type="button"
-                                  onClick={openPlaylist}
-                                  className="inline-flex items-center gap-2 rounded-full bg-coral/15 hover:bg-coral/25 text-coral px-3.5 py-2 text-xs font-medium tracking-wide ring-1 ring-coral/30 hover:ring-coral/60 transition"
-                                >
-                                  <MusicNoteIcon size={14} />
-                                  <span>{tPlaylist("openButton")}</span>
-                                </button>
-                              )}
-                            </div>
-                          </div>
+                        <div
+                          className={[
+                            "font-mono text-[0.7rem] sm:text-xs tracking-[0.25em] uppercase mb-1",
+                            it.accent.text,
+                          ].join(" ")}
+                        >
+                          {it.time}
                         </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </article>
+
+                        <h3 className="font-display italic text-2xl sm:text-3xl text-blanco leading-tight mb-3">
+                          {it.title}
+                        </h3>
+
+                        <p className="text-blanco/85 text-sm sm:text-base leading-relaxed mb-4 max-w-md lg:max-w-none lg:ml-auto">
+                          {it.desc}
+                        </p>
+
+                        <p
+                          className={[
+                            "font-display italic text-sm sm:text-base mb-5 border-y border-current/30 py-2 inline-block",
+                            it.accent.text,
+                          ].join(" ")}
+                        >
+                          {it.tip}
+                        </p>
+
+                        <div
+                          className={[
+                            "flex flex-wrap gap-2.5",
+                            isLeft ? "lg:justify-end" : "lg:justify-start",
+                          ].join(" ")}
+                        >
+                          <a
+                            href={it.locationUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 rounded-full bg-blanco/10 hover:bg-blanco/15 text-blanco px-3.5 py-2 text-xs font-medium tracking-wide ring-1 ring-blanco/15 hover:ring-blanco/30 transition"
+                          >
+                            <span className={it.accent.text}>
+                              <PinIcon size={14} />
+                            </span>
+                            <span>{it.locationLabel}</span>
+                            <span aria-hidden className="text-blanco/60">↗</span>
+                          </a>
+                          {it.giftCta && (
+                            <ElDiaActions accent={it.accent} variant="gifts" />
+                          )}
+                          {i === items.length - 1 && (
+                            <ElDiaActions accent={it.accent} variant="playlist" />
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </FadeUp>
             );
           })}
@@ -418,8 +355,6 @@ export default function ElDia() {
         <FadeUp delay={0.2} className="mt-14 flex flex-col items-center gap-5">
           <a
             href={allDayUrl}
-            target="_blank"
-            rel="noopener noreferrer"
             className="inline-flex items-center gap-2.5 rounded-full bg-oro-bright text-marron-deep px-6 py-3 text-sm font-semibold tracking-wide hover:bg-oro-bright/90 transition shadow-[0_0_30px_rgba(232,200,117,0.5)]"
           >
             <CalendarIcon size={16} />

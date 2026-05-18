@@ -27,6 +27,8 @@ export async function GET() {
   }
 }
 
+const DIET_KEYS = ["vegan", "vegetarian", "none", "other"] as const;
+
 function emptyTotals() {
   return {
     submissions: 0,
@@ -34,26 +36,45 @@ function emptyTotals() {
     declined: 0,
     headcount: 0,
     busSeats: 0,
+    diet: { vegan: 0, vegetarian: 0, none: 0, other: 0 },
+    allergies: {} as Record<string, number>,
   };
 }
 
 function computeTotals(rows: RsvpRow[]) {
-  let attending = 0;
-  let declined = 0;
-  let headcount = 0;
-  let busSeats = 0;
+  const t = emptyTotals();
+  t.submissions = rows.length;
+
+  const addDiet = (pref: string | null | undefined) => {
+    if (!pref) return;
+    if ((DIET_KEYS as readonly string[]).includes(pref)) {
+      t.diet[pref as keyof typeof t.diet]++;
+    }
+  };
+  const addAllergies = (list: string[] | null | undefined) => {
+    if (!Array.isArray(list)) return;
+    for (const a of list) {
+      t.allergies[a] = (t.allergies[a] ?? 0) + 1;
+    }
+  };
+
   for (const r of rows) {
     if (r.attending === "yes") {
-      attending++;
-      headcount++;
-      if (r.plus_one) headcount++;
-      if (r.bus === "yes") {
-        busSeats++;
-        if (r.plus_one && r.plus_one_bus === "yes") busSeats++;
+      t.attending++;
+      t.headcount++;
+      addDiet(r.diet_pref);
+      addAllergies(r.allergies);
+      if (r.bus === "yes") t.busSeats++;
+      if (r.plus_one) {
+        t.headcount++;
+        addDiet(r.plus_one_diet_pref);
+        addAllergies(r.plus_one_allergies);
+        if (r.plus_one_bus === "yes") t.busSeats++;
       }
     } else {
-      declined++;
+      t.declined++;
     }
   }
-  return { submissions: rows.length, attending, declined, headcount, busSeats };
+
+  return t;
 }

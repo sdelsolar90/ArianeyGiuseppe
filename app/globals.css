@@ -23,6 +23,7 @@
   --animate-candle: candle-flicker 6s ease-in-out infinite;
   --animate-scroll-pulse: scroll-pulse 2.5s ease-in-out infinite;
   --animate-disc: disc-spin 40s linear infinite;
+  --animate-bus: bus-travel 22s ease-in-out infinite alternate;
 }
 
 :root {
@@ -94,6 +95,15 @@ html {
   }
 }
 
+@keyframes bus-travel {
+  from {
+    top: 0%;
+  }
+  to {
+    top: 100%;
+  }
+}
+
 @keyframes bounce-down {
   0%,
   100% {
@@ -115,6 +125,7 @@ html {
   .animate-candle,
   .animate-scroll-pulse,
   .animate-disc,
+  .animate-bus,
   .arrow-bounce {
     animation: none !important;
   }
