@@ -216,8 +216,9 @@ export default function Hero() {
           transition={{ duration: 1, delay: 1.1, ease }}
           className="mt-12 sm:mt-16 flex flex-col sm:flex-row items-center gap-3 sm:gap-4"
         >
-          <span
-            className="inline-flex items-center gap-2.5 rounded-full backdrop-blur-md px-5 py-2.5 text-xs sm:text-sm tracking-wide"
+          <a
+            href="/api/ics?event=all"
+            className="group inline-flex items-center gap-2.5 rounded-full backdrop-blur-md px-5 py-2.5 text-xs sm:text-sm tracking-wide transition hover:bg-black/50"
             style={{
               background: "rgba(0,0,0,0.3)",
               border: "1px solid rgba(232,200,117,0.25)",
@@ -227,7 +228,13 @@ export default function Hero() {
               <CalendarIcon />
             </span>
             <span className="text-crema">{t("datePill")}</span>
-          </span>
+            <span
+              aria-hidden
+              className="text-oro-bright/70 group-hover:text-oro-bright transition"
+            >
+              ↗
+            </span>
+          </a>
 
           <a
             href={WEDDING.venue.mapsUrl}
