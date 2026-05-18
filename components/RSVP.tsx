@@ -312,8 +312,8 @@ export default function RSVP() {
                               hint={t("busHint")}
                               value={bus}
                               onChange={setBus}
-                              yesLabel={t("yes")}
-                              noLabel={t("no")}
+                              yesLabel={t("simpleYes")}
+                              noLabel={t("simpleNo")}
                             />
 
                             <DietField

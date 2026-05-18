@@ -82,6 +82,8 @@
     "attending": "Will you be there?",
     "yes": "Yes, I'll be there",
     "no": "I can't make it",
+    "simpleYes": "Yes",
+    "simpleNo": "No",
     "plusOne": "Bringing a plus one",
     "plusOneName": "Plus one's name",
     "bus": "I'll take the bus",

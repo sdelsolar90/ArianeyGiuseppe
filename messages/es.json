@@ -82,6 +82,8 @@
     "attending": "¿Vas a venir?",
     "yes": "Sí, allí estaré",
     "no": "No podré ir",
+    "simpleYes": "Sí",
+    "simpleNo": "No",
     "plusOne": "Vendré con acompañante",
     "plusOneName": "Nombre del acompañante",
     "bus": "Iré en el bus",
