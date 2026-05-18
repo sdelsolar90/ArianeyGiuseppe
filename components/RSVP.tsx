@@ -418,16 +418,6 @@ export default function RSVP() {
 
                         {attending === "yes" && (
                           <>
-                            <label className="flex items-center gap-3 cursor-pointer select-none pt-2">
-                              <input
-                                type="checkbox"
-                                checked={plusOne}
-                                onChange={(e) => setPlusOne(e.target.checked)}
-                                className="h-4 w-4 accent-terracota"
-                              />
-                              <span className="text-sm">{t("plusOne")}</span>
-                            </label>
-
                             <BusField
                               label={t("bus")}
                               hint={t("busHint")}

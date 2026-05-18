@@ -44,7 +44,7 @@ export default function ElDiaActions({
     <button
       type="button"
       onClick={openPlaylist}
-      className="inline-flex items-center gap-2 rounded-full bg-coral/15 hover:bg-coral/25 text-coral px-3.5 py-2 text-xs font-medium tracking-wide ring-1 ring-coral/30 hover:ring-coral/60 transition"
+      className="inline-flex items-center gap-2 rounded-full bg-coral text-blanco px-4 py-2.5 text-xs font-semibold tracking-wide ring-1 ring-coral/60 hover:bg-coral/85 transition shadow-sm"
     >
       <MusicNoteIcon size={14} />
       <span>{tPlaylist("openButton")}</span>

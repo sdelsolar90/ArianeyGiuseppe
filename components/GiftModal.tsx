@@ -67,7 +67,7 @@ export default function GiftModal() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ duration: 0.3, ease: "easeOut" }}
-            className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl bg-crema shadow-2xl ring-1 ring-marron/10"
+            className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto overflow-x-hidden rounded-2xl bg-crema shadow-2xl ring-1 ring-marron/10"
           >
             {/* gift decoration */}
             <div
