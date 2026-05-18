@@ -1,26 +1,121 @@
 @import "tailwindcss";
 
+@theme {
+  --color-terracota: #a0522d;
+  --color-terracota-soft: #b86a45;
+  --color-coral: #c9694e;
+  --color-crema: #faf3ea;
+  --color-marron: #3d1f0d;
+  --color-marron-deep: #2a1408;
+  --color-tabaco: #3a1f12;
+  --color-night: #1a0c06;
+  --color-night-2: #2a1810;
+  --color-oro: #c9a96e;
+  --color-oro-bright: #e8c875;
+  --color-oro-deep: #c9a961;
+  --color-blanco: #fff8f0;
+
+  --font-display: var(--font-cormorant), Georgia, serif;
+  --font-body: var(--font-dm-sans), system-ui, sans-serif;
+  --font-mono: var(--font-dm-mono), ui-monospace, monospace;
+
+  --animate-ken-burns: ken-burns 40s ease-in-out infinite alternate;
+  --animate-candle: candle-flicker 6s ease-in-out infinite;
+  --animate-scroll-pulse: scroll-pulse 2.5s ease-in-out infinite;
+  --animate-disc: disc-spin 40s linear infinite;
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: light;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+html,
+body {
+  background: var(--color-crema);
+  color: var(--color-marron);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+::selection {
+  background: var(--color-terracota);
+  color: var(--color-blanco);
+}
+
+@keyframes ken-burns {
+  0% {
+    transform: scale(1.05) translateX(-1.5%);
+  }
+  100% {
+    transform: scale(1.12) translateX(1.5%);
+  }
+}
+
+@keyframes candle-flicker {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  25% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 0.35;
+  }
+  75% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes scroll-pulse {
+  0%,
+  100% {
+    transform: scaleY(0.3);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes disc-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes bounce-down {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translateY(8px);
+    opacity: 1;
+  }
+}
+
+.arrow-bounce {
+  animation: bounce-down 2.2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-ken-burns,
+  .animate-candle,
+  .animate-scroll-pulse,
+  .animate-disc,
+  .arrow-bounce {
+    animation: none !important;
+  }
 }
