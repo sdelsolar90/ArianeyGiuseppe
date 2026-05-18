@@ -11,6 +11,7 @@ type Card = {
   note: ReactNode;
   image: string;
   email?: string;
+  bookingUrl?: string;
 };
 
 function HotelCard({ card, delay = 0 }: { card: Card; delay?: number }) {
@@ -58,6 +59,16 @@ function HotelCard({ card, delay = 0 }: { card: Card; delay?: number }) {
                 className="inline-flex items-center gap-1 rounded-full border border-terracota/40 text-terracota px-4 py-2 text-xs font-semibold tracking-wide hover:bg-terracota/5 transition"
               >
                 {t("sendEmail")} <span aria-hidden>↗</span>
+              </a>
+            )}
+            {card.bookingUrl && (
+              <a
+                href={card.bookingUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 rounded-full border border-terracota/40 text-terracota px-4 py-2 text-xs font-semibold tracking-wide hover:bg-terracota/5 transition"
+              >
+                {t("viewBooking")} <span aria-hidden>↗</span>
               </a>
             )}
           </div>
@@ -129,6 +140,7 @@ export default function Alojamiento() {
             mapsUrl: WEDDING.hotelRio.mapsUrl,
             note: t("rioNote"),
             image: "/images/hotel-rio.jpg",
+            bookingUrl: WEDDING.hotelRio.bookingUrl,
           }}
         />
       </div>

@@ -10,6 +10,7 @@ import {
   CalendarIcon,
 } from "./icons";
 import ElDiaActions from "./ElDiaActions";
+import TimelineBus from "./TimelineBus";
 
 type CalEvent = "embarque" | "ceremonia" | "fiesta" | "all";
 const icsUrl = (event: CalEvent) => `/api/ics?event=${event}`;
@@ -226,15 +227,8 @@ export default function ElDia() {
             }}
           />
 
-          {/* moving bus on the center line — desktop only */}
-          <span
-            aria-hidden
-            className="hidden lg:block absolute top-2 bottom-2 left-1/2 -translate-x-1/2 pointer-events-none w-0"
-          >
-            <span className="animate-bus absolute left-1/2 -translate-x-1/2 -translate-y-1/2 inline-flex h-10 w-10 items-center justify-center rounded-full bg-marron-deep text-oro-bright ring-2 ring-oro-bright/40 shadow-lg shadow-marron-deep/60">
-              <BusIcon size={18} />
-            </span>
-          </span>
+          {/* moving bus on the center line — only animates when section enters viewport */}
+          <TimelineBus />
 
           {items.map((it, i) => {
             const isLeft = i % 2 === 0;

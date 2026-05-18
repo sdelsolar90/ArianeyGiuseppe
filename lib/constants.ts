@@ -74,5 +74,7 @@ export const WEDDING = {
     address: "Civita Castellana",
     mapsUrl:
       "https://maps.google.com/?q=Hotel+Rio+Coverino,+Civita+Castellana",
+    bookingUrl:
+      "https://www.booking.com/hotel/it/agriturismo-rio-coverino.en-gb.html?aid=311984&label=agriturismo-rio-coverino-e0YJQDsIFDnXZ_BWtE6Z%2AAS381941605675%3Apl%3Ata%3Ap1%3Ap2%3Aac%3Aap%3Aneg%3Afi%3Atiaud-2382347442888%3Akwd-71413028896%3Alp9198565%3Ali%3Adec%3Adm%3Appccp%3DUmFuZG9tSVYkc2RlIyh9YXwxhKG0pUU-mcMVT-JwQpc&sid=2d434cd0df4d5592b9cdc577b6829cab&checkin=2026-10-10&checkout=2026-10-11&group_adults=2",
   },
 } as const;
