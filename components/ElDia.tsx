@@ -8,28 +8,8 @@ import { WEDDING } from "@/lib/constants";
 import { BusIcon, RingIcon, GlassIcon, PinIcon, CalendarIcon, MusicNoteIcon } from "./icons";
 import { openPlaylist } from "./PlaylistModal";
 
-function buildGoogleCalendarUrl({
-  title,
-  start,
-  end,
-  location,
-  details,
-}: {
-  title: string;
-  start: string;
-  end: string;
-  location: string;
-  details: string;
-}) {
-  const params = new URLSearchParams({
-    action: "TEMPLATE",
-    text: title,
-    dates: `${start}/${end}`,
-    location,
-    details,
-  });
-  return `https://www.google.com/calendar/render?${params.toString()}`;
-}
+type CalEvent = "embarque" | "ceremonia" | "fiesta" | "all";
+const icsUrl = (event: CalEvent) => `/api/ics?event=${event}`;
 
 type Accent = {
   text: string;
@@ -79,8 +59,7 @@ type Item = {
   tip: string;
   locationLabel: string;
   locationUrl: string;
-  calStart: string;
-  calEnd: string;
+  calEvent: CalEvent;
   Icon: typeof BusIcon;
   accent: Accent;
   numeral: string;
@@ -91,9 +70,6 @@ export default function ElDia() {
   const tPlaylist = useTranslations("playlist");
   const [openIdx, setOpenIdx] = useState<number | null>(0);
 
-  const venueAddress = `${WEDDING.venue.name}, ${WEDDING.venue.city}`;
-  const hotelAddress = `${WEDDING.hotelNhow.name}, ${WEDDING.hotelNhow.address}`;
-
   const items: Item[] = [
     {
       time: t("item1Time"),
@@ -102,8 +78,7 @@ export default function ElDia() {
       tip: t("item1Tip"),
       locationLabel: t("item1Location"),
       locationUrl: WEDDING.hotelNhow.mapsUrl,
-      calStart: "20261010T083000Z",
-      calEnd: "20261010T100000Z",
+      calEvent: "embarque",
       Icon: BusIcon,
       accent: ACCENTS[0],
       numeral: NUMERALS[0],
@@ -115,8 +90,7 @@ export default function ElDia() {
       tip: t("item2Tip"),
       locationLabel: t("item2Location"),
       locationUrl: WEDDING.venue.mapsUrl,
-      calStart: "20261010T103000Z",
-      calEnd: "20261010T113000Z",
+      calEvent: "ceremonia",
       Icon: RingIcon,
       accent: ACCENTS[1],
       numeral: NUMERALS[1],
@@ -128,21 +102,14 @@ export default function ElDia() {
       tip: t("item3Tip"),
       locationLabel: t("item3Location"),
       locationUrl: WEDDING.venue.mapsUrl,
-      calStart: "20261010T113000Z",
-      calEnd: "20261010T210000Z",
+      calEvent: "fiesta",
       Icon: GlassIcon,
       accent: ACCENTS[2],
       numeral: NUMERALS[2],
     },
   ];
 
-  const allDayUrl = buildGoogleCalendarUrl({
-    title: `Ariane & Giuseppe · ${t("title")}`,
-    start: "20261010T083000Z",
-    end: "20261010T210000Z",
-    location: venueAddress,
-    details: `${t("item1Title")} · ${t("item1Time")} — ${hotelAddress}\n${t("item2Title")} · ${t("item2Time")} — ${venueAddress}\n${t("item3Title")} · ${t("item3Time")} — ${venueAddress}`,
-  });
+  const allDayUrl = icsUrl("all");
 
   return (
     <section
@@ -235,13 +202,7 @@ export default function ElDia() {
 
           {items.map((it, i) => {
             const open = openIdx === i;
-            const calUrl = buildGoogleCalendarUrl({
-              title: `${t("title")} · ${it.title}`,
-              start: it.calStart,
-              end: it.calEnd,
-              location: i === 0 ? hotelAddress : venueAddress,
-              details: `${it.desc}\n\n${it.tip}`,
-            });
+            const calUrl = icsUrl(it.calEvent);
 
             return (
               <FadeUp as="li" key={i} delay={i * 0.06} className="relative pl-14 sm:pl-16">
