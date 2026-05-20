@@ -67,7 +67,7 @@ export const WEDDING = {
     address: "Corso d'Italia 1, Roma",
     mapsUrl:
       "https://maps.google.com/?q=Hotel+Nhow+Roma,+Corso+d%27Italia+1",
-    bookingEmail: "hotelbooking@wedinrome.com",
+    bookingEmail: "hotelbooking@2wedinrome.com",
   },
   hotelRio: {
     name: "Hotel Rio Coverino",
